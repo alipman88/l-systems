@@ -11,7 +11,7 @@ function calculateLSystem(initial, rules, iterations) {
       .reduce(function(hash, rule) { hash[rule[0]] = rule[1]; return hash }, {});
 
     //  Build a regex for to substitute multiple strings at once
-    var regex = new RegExp(Object.keys(rulesHash).join("|"), "gi");
+    var regex = new RegExp(Object.keys(rulesHash).join("|").replace("+", "\\+"), "gi");
 
     // Calculate the next iteration
     var nextIteration = initial.replace(regex, function(matched) { return rulesHash[matched] });
