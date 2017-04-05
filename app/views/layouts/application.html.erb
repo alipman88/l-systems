@@ -10,5 +10,9 @@
 
   <body>
     <%= yield %>
+
+    <%= javascript_include_tag 'react', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'react_ujs', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'components', 'data-turbolinks-track': 'reload' %>
   </body>
 </html>
