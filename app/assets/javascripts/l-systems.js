@@ -14,7 +14,7 @@ function calculateLSystem(initial, rules, iterations) {
     var regex = new RegExp(Object.keys(rulesHash).join("|").replace("+", "\\+"), "gi");
 
     // Calculate the next iteration
-    var nextIteration = initial.replace(regex, function(matched) { return rulesHash[matched] });
+    var nextIteration = initial.replace(regex, function(matched) { return rulesHash[matched] || "" });
 
     return calculateLSystem(nextIteration, rules, iterations - 1);
   }
