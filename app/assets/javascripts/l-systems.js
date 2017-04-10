@@ -19,3 +19,28 @@ function calculateLSystem(initial, rules, iterations) {
     return calculateLSystem(nextIteration, rules, iterations - 1);
   }
 }
+
+
+// Convert an L-System output string into a set of coordinates generated via turtle graphic-like steps
+
+function traceLSystem(steps, angle) {
+  var stepsArray = steps.split("");
+  var currentAngle = 0;
+  var positions = [{x: 0, y: 0}];
+
+  for (var i=0; i < stepsArray.length; i++) {
+    var char = stepsArray[i];
+
+    if (char == "+") {
+      currentAngle = (currentAngle + angle) % 360;
+    } else if (char == "-") {
+      currentAngle = (currentAngle - angle) % 360;
+    } else if (char.match(/[A-M]/)) {
+      var nextX = positions[positions.length - 1].x + Math.cos( currentAngle * Math.PI/180 );
+      var nextY = positions[positions.length - 1].y + Math.sin( currentAngle * Math.PI/180 );
+      positions.push({x: nextX, y: nextY});
+    }
+  }
+
+  return positions;
+}
