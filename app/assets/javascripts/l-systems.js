@@ -26,6 +26,7 @@ function calculateLSystem(initial, rules, iterations) {
 function traceLSystem(steps, angle) {
   var stepsArray   = steps.split("");
   var currentAngle = 0;
+  var stack        = [];
   var positions    = [{x: 0, y: 0}];
   var boundary     = {min: {x: 0, y: 0}, max: {x: 0, y: 0}}
 
@@ -36,6 +37,13 @@ function traceLSystem(steps, angle) {
       currentAngle = (currentAngle + angle) % 360;
     } else if (char == "-") {
       currentAngle = (currentAngle - angle) % 360;
+    } else if (char == "[") {
+      stack.push({position: positions[positions.length - 1], angle: currentAngle});
+    } else if (char == "]") {
+      var jump = stack.pop();
+      positions.push(null);
+      positions.push(jump.position);
+      currentAngle = jump.angle;
     } else if (char.match(/[A-M]/)) {
       var nextX = positions[positions.length - 1].x + Math.cos( currentAngle * Math.PI/180 );
       var nextY = positions[positions.length - 1].y + Math.sin( currentAngle * Math.PI/180 );
@@ -48,9 +56,9 @@ function traceLSystem(steps, angle) {
   }
 
   var zeroAdjustedPositions = positions.map(function(position) {
-    return {
-      x: position.x - boundary.min.x,
-      y: position.y - boundary.min.y
+    return position == null ? null : {
+      x: (position.x - boundary.min.x).toFixed(1),
+      y: (boundary.max.y - position.y).toFixed(1)
     };
   });
 

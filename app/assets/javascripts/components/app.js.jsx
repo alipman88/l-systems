@@ -7,6 +7,7 @@ class App extends React.Component {
     this.changeAngle      = this.changeAngle.bind(this);
     this.changeIterations = this.changeIterations.bind(this);
     this.changeRules      = this.changeRules.bind(this);
+    this.sampleRules      = this.sampleRules.bind(this);
     this.selectSampleRule = this.selectSampleRule.bind(this);
     this.drawLSystem      = this.drawLSystem.bind(this);
   }
@@ -27,15 +28,18 @@ class App extends React.Component {
     this.setState({rules: event.target.value});
   }
 
-  selectSampleRule(event) {
-    const sampleRules = {
+  sampleRules() {
+    return {
       "Koch Snowflake":      {initial: "F++F++F", angle: 60, rules: "F: F-F++F-F"},
       "Dragon Curve":        {initial: "FX",      angle: 90, rules: "X: X+YF+\nY: -FX-Y"},
       "Sierpinski Triangle": {initial: "A",       angle: 60, rules: "A: +B-A-B+\nB: -A+B+A-"},
-      "Lévy C Curve":        {initial: "F",       angle: 45, rules: "F: +F--F+"}
+      "Lévy C Curve":        {initial: "F",       angle: 45, rules: "F: +F--F+"},
+      "Fractal Plant":       {initial: "X",       angle: 25, rules: "X: F-[[X]+X]+F[+FX]-X\nF: FF"}
     };
+  }
 
-    this.setState(sampleRules[event.target.value]);
+  selectSampleRule(event) {
+    this.setState(this.sampleRules()[event.target.value]);
   }
 
   componentDidMount() {
@@ -50,7 +54,14 @@ class App extends React.Component {
     d3.select("svg").selectAll("*").remove();
     var output  = calculateLSystem(this.state.initial, this.state.rules, this.state.iterations);
     var tracing = traceLSystem(output, this.state.angle);
-    var line = d3.line()(tracing.positions.map(function(p) { return [p.x.toFixed(1), p.y.toFixed(1)] }));
+
+    line = [];
+    for (var i=0; i<tracing.positions.length; i++) {
+      if (tracing.positions[i] != null) {
+        char = tracing.positions[i-1] == null ? "M" : "L";
+        line.push(char + tracing.positions[i].x + "," + tracing.positions[i].y);
+      }
+    }
 
     d3.select("svg")
       .attr("viewBox", [0, 0, tracing.width, tracing.height].join(" "))
@@ -58,7 +69,7 @@ class App extends React.Component {
 
     d3.select("svg")
       .append("path")
-      .attr("d", line)
+      .attr("d", line.join())
       .attr("stroke", "black")
       .attr("stroke-width", 0.1)
       .attr("fill", "none");
@@ -71,10 +82,9 @@ class App extends React.Component {
           <div className="twelve columns" style={ {borderBottom: "1px solid #CCC"} }>
             <label>Select an example L-System or build a custom one below</label>
             <select onChange={this.selectSampleRule}>
-              <option value="Koch Snowflake">Koch Snowflake</option>
-              <option value="Dragon Curve">Dragon Curve</option>
-              <option value="Sierpinski Triangle">Sierpinski Triangle</option>
-              <option value="Lévy C Curve">Lévy C Curve</option>
+              {Object.keys(this.sampleRules()).map(function(value){
+                return <option key={value} value={value}>{value}</option>;
+              })}
             </select>
           </div>
 
@@ -91,7 +101,7 @@ class App extends React.Component {
 
             <div className="four columns">
               <label>Iterations</label>
-              <input type="number" value={this.state.iterations} min="0" max="14" onChange={this.changeIterations} />
+              <input type="number" value={this.state.iterations} min="0" max="16" onChange={this.changeIterations} />
             </div>
           </div>
 
