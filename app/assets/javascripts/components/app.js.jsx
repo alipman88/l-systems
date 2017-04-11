@@ -8,6 +8,7 @@ class App extends React.Component {
     this.changeIterations = this.changeIterations.bind(this);
     this.changeRules      = this.changeRules.bind(this);
     this.selectSampleRule = this.selectSampleRule.bind(this);
+    this.drawLSystem      = this.drawLSystem.bind(this);
   }
 
   changeInitial(event) {
@@ -37,24 +38,33 @@ class App extends React.Component {
     this.setState(sampleRules[event.target.value]);
   }
 
+  componentDidMount() {
+    this.drawLSystem();
+  }
+
+  componentDidUpdate() {
+    this.drawLSystem();
+  }
+
+  drawLSystem() {
+    d3.select("svg").selectAll("*").remove();
+    var output  = calculateLSystem(this.state.initial, this.state.rules, this.state.iterations);
+    var tracing = traceLSystem(output, this.state.angle);
+    var line = d3.line()(tracing.positions.map(function(p) { return [p.x.toFixed(1), p.y.toFixed(1)] }));
+
+    d3.select("svg")
+      .attr("viewBox", [0, 0, tracing.width, tracing.height].join(" "))
+      .style({"height": 100 * tracing.height/tracing.width + "%"});
+
+    d3.select("svg")
+      .append("path")
+      .attr("d", line)
+      .attr("stroke", "black")
+      .attr("stroke-width", 0.1)
+      .attr("fill", "none");
+  }
+
   render() {
-    const output = calculateLSystem(this.state.initial, this.state.rules, this.state.iterations);
-    const positions = traceLSystem(output, this.state.angle);
-
-    const xValues = positions.map(function(position){ return position.x; });
-    const yValues = positions.map(function(position){ return position.y; });
-
-    const minX = Math.min.apply(null, xValues);
-    const minY = Math.min.apply(null, yValues);
-    const maxX = Math.max.apply(null, xValues);
-    const maxY = Math.max.apply(null, yValues);
-
-    const positionsString = positions.map(function(position, index){ return (index == 0 ? "M" : "L") + (position.x - minX) + " " + (position.y - minY) }).join(" ");
-
-    const viewBox = [0, 0, maxX - minX, maxY - minY].join(" ");
-
-    const aspectRatio = 100 * (maxY - minY)/(maxX - minX);
-
     return (
       <div className="row">
         <div className="four columns">
@@ -95,9 +105,7 @@ class App extends React.Component {
 
         <div className="eight columns">
           <div style={ { position: "relative", float: "left", width: "100%", height: "0", paddingBottom: "100%" } }>
-            <svg style={ { position: "absolute", left: "0", width: "100%", height: aspectRatio + "%", overflow: "visible" } } viewBox={viewBox} preserveAspectRatio="none">
-              <path d={positionsString} stroke="black" fill="none" vectorEffect="non-scaling-stroke" strokeWidth="1px" />
-            </svg>
+            <svg style={ { position: "absolute", left: "0", width: "100%", marginBottom: "50px", overflow: "visible" } } preserveAspectRatio="none"></svg>
           </div>
         </div>
       </div>
