@@ -1,7 +1,7 @@
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {initial: "F++F++F", angle: 60, iterations: 2, rules: "F: F-F++F-F"};
+    this.state = {initial: "F++F++F", angle: 60, iterations: 2, rules: "F: F-F++F-F", help: false};
 
     this.changeInitial    = this.changeInitial.bind(this);
     this.changeAngle      = this.changeAngle.bind(this);
@@ -10,6 +10,7 @@ class App extends React.Component {
     this.sampleRules      = this.sampleRules.bind(this);
     this.selectSampleRule = this.selectSampleRule.bind(this);
     this.drawLSystem      = this.drawLSystem.bind(this);
+    this.toggleHelp       = this.toggleHelp.bind(this);
   }
 
   changeInitial(event) {
@@ -34,12 +35,18 @@ class App extends React.Component {
       "Dragon Curve":        {initial: "FX",      angle: 90, rules: "X: X+YF+\nY: -FX-Y"},
       "Sierpinski Triangle": {initial: "A",       angle: 60, rules: "A: +B-A-B+\nB: -A+B+A-"},
       "Lévy C Curve":        {initial: "F",       angle: 45, rules: "F: +F--F+"},
-      "Fractal Plant":       {initial: "X",       angle: 25, rules: "X: F-[[X]+X]+F[+FX]-X\nF: FF"}
+      "Fractal Plant":       {initial: "S",       angle: 25, rules: "S: ++++X\nX: F-[[X]+X]+F[+FX]-X\nF: FF"}
     };
   }
 
   selectSampleRule(event) {
     this.setState(this.sampleRules()[event.target.value]);
+  }
+
+  toggleHelp(event) {
+    this.setState({help: !this.state.help});
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   componentDidMount() {
@@ -50,11 +57,13 @@ class App extends React.Component {
     this.drawLSystem();
   }
 
+  // Update the SVG image in response to state change
   drawLSystem() {
     d3.select("svg").selectAll("*").remove();
     var output  = calculateLSystem(this.state.initial, this.state.rules, this.state.iterations);
     var tracing = traceLSystem(output, this.state.angle);
 
+    // Create an SVG path element from the set of turtle positions
     line = [];
     for (var i=0; i<tracing.positions.length; i++) {
       if (tracing.positions[i] != null) {
@@ -79,6 +88,15 @@ class App extends React.Component {
     return (
       <div className="row">
         <div className="four columns">
+          <div className="twelve columns">
+            <label><a href="#" onClick={this.toggleHelp}>Instructions</a></label>
+          </div>
+
+          <div id="help" className="twelve columns" style={ {display: this.state.help ? "block" : "none", borderBottom: "1px solid #CCC" } }>
+            <p><a href="https://en.wikipedia.org/wiki/L-system" target="_blank">L-Systems</a> are a type of formal grammar which uses recursively-applied character substitution rules to produce strings that can then be translated into fractal images via turtle graphics. Each character in the output string corresponds to an instruction like "turn right," "turn left," or "move forward."</p>
+            <p>In the widget below, the characters <span style={ {fontFamily: "monospace"} }>+</span> and <span style={ {fontFamily: "monospace"} }>-</span> rotate the turtle left and right. The letters <span style={ {fontFamily: "monospace"} }>A-M</span> move the turtle forward one step, and the letters <span style={ {fontFamily: "monospace"} }>N-Z</span> are placeholders which don't produce any action, but control the outcome's evolution. <span style={ {fontFamily: "monospace"} }>[</span> and <span style={ {fontFamily: "monospace"} }>]</span> are special symbols, which push to or pop the turtle's position from an array, causing the turtle to jump from one position to another.</p>
+          </div>
+
           <div className="twelve columns" style={ {borderBottom: "1px solid #CCC"} }>
             <label>Select an example L-System or build a custom one below</label>
             <select onChange={this.selectSampleRule}>
@@ -105,10 +123,18 @@ class App extends React.Component {
             </div>
           </div>
 
-          <div className="row">
+          <div className="row" style={ {borderBottom: "1px solid #CCC"} }>
             <div className="twelve columns">
               <label>Rules</label>
               <textarea value={this.state.rules} onChange={this.changeRules} />
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="twelve columns">
+              <p style={ {textAlign: "right"} }>
+                <a href="https://github.com/alipman88/l-systems" target="_blank"><i className="fa fa-github" aria-hidden="true"></i> Source code</a>
+              </p>
             </div>
           </div>
         </div>

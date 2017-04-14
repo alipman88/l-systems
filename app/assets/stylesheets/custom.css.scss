@@ -1,3 +1,7 @@
+body {
+  overflow-y: scroll;
+}
+
 input, textarea {
   width: 100%;
 }
@@ -6,3 +10,5 @@ textarea {
   height: 10em;
   font-family: monospace;
 }
+
+a { text-decoration: none; }
