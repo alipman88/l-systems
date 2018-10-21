@@ -35,7 +35,8 @@ class App extends React.Component {
       "Dragon Curve":        {initial: "FX",      angle: 90, rules: "X: X+YF+\nY: -FX-Y"},
       "Sierpinski Triangle": {initial: "A",       angle: 60, rules: "A: +B-A-B+\nB: -A+B+A-"},
       "Lévy C Curve":        {initial: "F",       angle: 45, rules: "F: +F--F+"},
-      "Fractal Plant":       {initial: "S",       angle: 25, rules: "S: ++++X\nX: F-[[X]+X]+F[+FX]-X\nF: FF"}
+      "Fern":                {initial: "++++A",   angle: 15, rules: "A: C[+++++F]C[-----F]C[++++DG]C[------DG]-A\nB: BC\nC: B\nD: C\nF: A\nG: F"},
+      "Antenna":             {initial: "++A",     angle: 18, rules: "A: C[C+++++F]C[-----F]C[C+++++DG]C[-----DG]A\nB: BC\nC: B\nD: C\nF: A\nG: F"}
     };
   }
 
